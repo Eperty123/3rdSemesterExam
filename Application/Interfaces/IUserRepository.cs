@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Application.DTOs;
+using Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Application.Interfaces
     public interface IUserRepository
     {
         List<User> ReadAllUsers();
-        User CreateUser(string username, string password, string email, string usertype);
+        User CreateUser(User user);
         User GetUser(int id);
         User DeleteUser(int id);
         User UpdateUser(int id, User user);

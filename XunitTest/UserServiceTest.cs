@@ -1,6 +1,10 @@
 using Application;
+using Application.DTOs;
 using Application.Interfaces;
+using Application.Validators;
+using AutoMapper;
 using Domain;
+using FluentValidation;
 using Moq;
 
 namespace XunitTest
@@ -14,9 +18,14 @@ namespace XunitTest
             //Arrange
             Mock<IUserRepository> mockRepository = new Mock<IUserRepository>();
             IUserRepository repository = mockRepository.Object;
+            var mapper = new MapperConfiguration(config =>
+            {
+                config.CreateMap<RegisterUserDTO, User>();
+            }).CreateMapper();
+            var validator = new UserValidator();
 
             //Act
-            IUserService userService = new UserService(repository);
+            IUserService userService = new UserService(repository, mapper, validator);
 
             //Assert
             Assert.NotNull(userService);
@@ -29,9 +38,14 @@ namespace XunitTest
         {
             //Arrange
             IUserService userService = null;
+            var mapper = new MapperConfiguration(config =>
+            {
+                config.CreateMap<RegisterUserDTO, User>();
+            }).CreateMapper();
+            var validator = new UserValidator();
 
             //Act + Assert
-            var ex = Assert.Throws<ArgumentException>(() => userService = new UserService(null));
+            var ex = Assert.Throws<ArgumentException>(() => userService = new UserService(null, mapper, validator));
 
             Assert.Equal("Missing repository", ex.Message);
             Assert.Null(userService);
@@ -39,57 +53,67 @@ namespace XunitTest
 
         //Test 1.3 - Valid inputs
         [Theory]
-        [InlineData("MartinK", "martink@yahoo.com", "hackme", "Client")] 
-        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "Coach")] 
+        [InlineData("MartinK", "martink@yahoo.com", "hackme", "Client")]    //Valid client user
+        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "Coach")]   //Valid coach user
         public void CreateValidUser(string username, string email, string password, string usertype)
         {
             // Arrange
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
             IUserRepository repository = userRepositoryMock.Object;
 
-            User fakeUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
+            RegisterUserDTO validUserDTO = new RegisterUserDTO { Username = username, Email = email, Password = password, Usertype = usertype };
+            User validUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
 
-            userRepositoryMock.Setup(x => x.CreateUser(username, password, email, usertype)).Returns(fakeUser);
+            userRepositoryMock.Setup(x => x.CreateUser(validUser)).Returns(validUser);
 
-            IUserService service = new UserService(repository);
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
+            mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(validUser);
+
+            var validator = new UserValidator();
+
+            IUserService service = new UserService(repository, mockMapper.Object, validator);
 
             // Act
-            User result = service.CreateUser(username, password, email, usertype);
+            User result = service.CreateUser(validUserDTO);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(fakeUser, result);
-            userRepositoryMock.Verify(x => x.CreateUser(username, password, email, usertype), Times.Once);
+            Assert.Equal(validUser.Username, result.Username);
+            userRepositoryMock.Verify(x => x.CreateUser(validUser), Times.Once);
         }
 
         //Test 1.4 - Invalid inputs
         [Theory]
-        [InlineData("", "penguinz0@yahoo.com", "hackme", "Coach")]
-        [InlineData(null, "penguinz0@yahoo.com", "hackme", "Coach")]
-        [InlineData("Charlie", "", "hackme", "Coach")]
-        [InlineData("Charlie", null, "hackme", "Coach")]
-        [InlineData("Charlie", "penguinz0@yahoo.com", "", "Coach")]
-        [InlineData("Charlie", "penguinz0@yahoo.com", null, "Coach")]
-        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "")]
-        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", null)]
-        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "UserType")]
+        [InlineData("", "penguinz0@yahoo.com", "hackme", "Coach")]              //Username is an empty string
+        [InlineData(null, "penguinz0@yahoo.com", "hackme", "Coach")]            //Username is null
+        [InlineData("Charlie", "", "hackme", "Coach")]                          //Email is an empty string
+        [InlineData("Charlie", null, "hackme", "Coach")]                        //Email is null
+        [InlineData("Charlie", "penguinz0@yahoo.com", "", "Coach")]             //Password is an empty string
+        [InlineData("Charlie", "penguinz0@yahoo.com", null, "Coach")]           //Password is null
+        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "")]            //UserType is an empty string
+        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", null)]          //UserType is null
+        [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "UserType")]    //UserType is not "Client" or "Coach"
         public void CreateInvalidUser(string username, string email, string password, string usertype)
         {
             // Arrange
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
             IUserRepository repository = userRepositoryMock.Object;
 
-            User fakeUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
+            RegisterUserDTO invalidUserDTO = new RegisterUserDTO { Username = username, Email = email, Password = password, Usertype = usertype };
+            User invalidUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
 
-            userRepositoryMock.Setup(x => x.CreateUser(username, password, email, usertype)).Returns(fakeUser);
+            userRepositoryMock.Setup(x => x.CreateUser(invalidUser)).Returns(invalidUser);
 
-            IUserService service = new UserService(repository);
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
+            mockMapper.Setup(x => x.Map<User>(invalidUserDTO)).Returns(invalidUser);
+            var validator = new UserValidator();
+
+            IUserService service = new UserService(repository, mockMapper.Object, validator);
 
             //Act + Assert
             
-            Assert.Throws<ArgumentException>(() => service.CreateUser(username, password, email, usertype));
+            Assert.Throws<ValidationException>(() => service.CreateUser(invalidUserDTO));
 
-            userRepositoryMock.Verify(x => x.CreateUser(username, password, email, usertype), Times.Never);
+            userRepositoryMock.Verify(x => x.CreateUser(invalidUser), Times.Never);
         }
 
     }

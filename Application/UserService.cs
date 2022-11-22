@@ -1,7 +1,9 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Validators;
+using AutoMapper;
 using Domain;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,20 +15,27 @@ namespace Application
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private IMapper _mapper;
+        private IValidator<RegisterUserDTO> _registerUserValidator;
+
+        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<RegisterUserDTO> registerUserValidator)
         {
             if (userRepository == null)
                 throw new ArgumentException("Missing repository");
+
             _userRepository = userRepository;
+            _mapper = mapper;
+            _registerUserValidator = registerUserValidator;
         }
 
-        public User CreateUser(string username, string password, string email, string usertype)
+        public User CreateUser(RegisterUserDTO dto)
         {
-            //var dto = new RegisterUserDTO() { Usertype= usertype, Email = email, Password = password, Username = username };
-            //UserValidator validator = new UserValidator();
-            //if (!validator.Validate(dto).IsValid)
-            //    throw new ArgumentException();
-            return _userRepository.CreateUser(username, password, email, usertype);
+            var validation = _registerUserValidator.Validate(dto);
+
+            if (!validation.IsValid)
+                throw new ValidationException(validation.ToString());
+
+            return _userRepository.CreateUser(_mapper.Map<User>(dto));
         }
 
         public User DeleteUser(int id)
