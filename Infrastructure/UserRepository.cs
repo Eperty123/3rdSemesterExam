@@ -6,16 +6,18 @@ namespace Infrastructure
 {
     public class UserRepository : IUserRepository
     {
-        private DbContextOptions<DbContext> _opts;
+        private DatabaseContext _context;
 
-        public UserRepository() 
+        public UserRepository(DatabaseContext databaseContext) 
         {
-            _opts= new DbContextOptionsBuilder<DbContext>()
-                .UseSqlite("Data source=../API/db.db").Options; ;
+            _context = databaseContext;
         }
+
         public User CreateUser(User user)
         {
-            throw new NotImplementedException();
+            _context.UserTable.Add(user);
+            _context.SaveChanges();
+            return user;
         }
 
         public User DeleteUser(int id)
