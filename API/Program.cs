@@ -2,6 +2,8 @@ using Application.DTOs;
 using AutoMapper;
 using Domain;
 using FluentValidation;
+using Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,10 @@ var mapper = new MapperConfiguration(config =>
 }).CreateMapper();
 
 builder.Services.AddSingleton(mapper);
+
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite(
+    "Data source=db.db"
+    ));
 
 var app = builder.Build();
 
