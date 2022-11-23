@@ -11,6 +11,7 @@ namespace Infrastructure
         public UserRepository(DatabaseContext databaseContext) 
         {
             _context = databaseContext;
+            
         }
 
         public User CreateUser(User user)

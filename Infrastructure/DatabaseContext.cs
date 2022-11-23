@@ -10,7 +10,7 @@ namespace Infrastructure
 {
     public class DatabaseContext : DbContext
     {
-        DatabaseContext(DbContextOptions<DatabaseContext> opts) : base(opts)
+        public DatabaseContext(DbContextOptions<DatabaseContext> opts) : base(opts)
         {
 
         }
@@ -28,25 +28,23 @@ namespace Infrastructure
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.Id);
+
             //Booking
             modelBuilder.Entity<Booking>()
                 .Property(b => b.Id) 
                 .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<Booking>()
+                .HasKey(b => b.Id);
+
             //Set up foreign keys
-            modelBuilder.Entity<Booking>()
-                .HasOne(booking => booking.Coach)
-                .WithMany(coach => coach.Bookings)
-                .HasForeignKey(booking => booking.Coach.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Booking>()
-                .HasOne(booking => booking.Client)
-                .WithMany(client => client.Bookings)
-                .HasForeignKey(booking => booking.Client.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+            
         }
 
         public DbSet<User> UserTable { get; set; }
         public DbSet<Booking> BookingTable { get; set; }
+        
     }
 }
