@@ -16,9 +16,25 @@ namespace Infrastructure
 
         public User CreateUser(User user)
         {
-            _context.UserTable.Add(user);
-            _context.SaveChanges();
-            return user;
+            try
+            {
+                GetUserByEmail(user.Email);
+                throw new Exception("This email is already in use");
+            }
+            catch (KeyNotFoundException)
+            {
+                try
+                {
+                    GetUserByUsername(user.Username);
+                    throw new Exception("This username is already in use");
+                }
+                catch (KeyNotFoundException)
+                {
+                    _context.UserTable.Add(user);
+                    _context.SaveChanges();
+                    return user;
+                }
+            }
         }
 
         public User DeleteUser(int id)
