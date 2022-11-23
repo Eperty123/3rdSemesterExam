@@ -34,5 +34,11 @@ namespace API.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpGet]
+        public void RebuildDB()
+        {
+            _userService.RebuildDB();
+        }
     }
 }

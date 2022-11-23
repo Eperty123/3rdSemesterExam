@@ -15,5 +15,6 @@ namespace Application.Interfaces
         User GetUser(int id);
         User DeleteUser(int id);
         User UpdateUser(int id, User user);
+        void RebuildDB();
     }
 }

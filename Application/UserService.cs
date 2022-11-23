@@ -30,12 +30,29 @@ namespace Application
 
         public User CreateUser(RegisterUserDTO dto)
         {
-            var validation = _registerUserValidator.Validate(dto);
+            try
+            {
+                _userRepository.GetUserByEmail(dto.Email);
+                throw new Exception("This email is already in use");
+            }
+            catch (KeyNotFoundException)
+            {
+                try
+                {
+                    _userRepository.GetUserByUsername(dto.Username);
+                    throw new Exception("This username is already in use");
+                }
+                catch (KeyNotFoundException)
+                {
+                    var validation = _registerUserValidator.Validate(dto);
 
-            if (!validation.IsValid)
-                throw new ValidationException(validation.ToString());
+                    if (!validation.IsValid)
+                        throw new ValidationException(validation.ToString());
 
-            return _userRepository.CreateUser(_mapper.Map<User>(dto));
+                    return _userRepository.CreateUser(_mapper.Map<User>(dto));
+                }
+            }
+            
         }
 
         public User DeleteUser(int id)
@@ -56,6 +73,10 @@ namespace Application
         public User UpdateUser(int id, User user)
         {
             throw new NotImplementedException();
+        }
+        public void RebuildDB()
+        {
+            _userRepository.RebuildDB();
         }
     }
 }
