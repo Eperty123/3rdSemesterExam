@@ -18,14 +18,11 @@ namespace XunitTest
             //Arrange
             Mock<IUserRepository> mockRepository = new Mock<IUserRepository>();
             IUserRepository repository = mockRepository.Object;
-            var mapper = new MapperConfiguration(config =>
-            {
-                config.CreateMap<RegisterUserDTO, User>();
-            }).CreateMapper();
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
             var validator = new UserValidator();
 
             //Act
-            IUserService userService = new UserService(repository, mapper, validator);
+            IUserService userService = new UserService(repository, mockMapper.Object, validator);
 
             //Assert
             Assert.NotNull(userService);
@@ -38,14 +35,11 @@ namespace XunitTest
         {
             //Arrange
             IUserService userService = null;
-            var mapper = new MapperConfiguration(config =>
-            {
-                config.CreateMap<RegisterUserDTO, User>();
-            }).CreateMapper();
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
             var validator = new UserValidator();
 
             //Act + Assert
-            var ex = Assert.Throws<ArgumentException>(() => userService = new UserService(null, mapper, validator));
+            var ex = Assert.Throws<ArgumentException>(() => userService = new UserService(null, mockMapper.Object, validator));
 
             Assert.Equal("Missing repository", ex.Message);
             Assert.Null(userService);
