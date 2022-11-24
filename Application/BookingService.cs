@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
+using Application.Validators;
 using Domain;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,21 @@ namespace Application
 {
     public class BookingService : IBookingService
     {
+        private IBookingRepository _bookingRepository;
+        private BookingValidator _bookingValidator;
+        public BookingService(IBookingRepository repository, BookingValidator bookingValidator)
+        {
+            if (repository == null)
+                throw new ArgumentException("Missing repository");
+            _bookingRepository = repository;
+            _bookingValidator = bookingValidator;
+        }
         public Booking CreateBooking(Booking booking)
         {
-            throw new NotImplementedException();
+            var validation = _bookingValidator.Validate(booking);
+            if (!validation.IsValid)
+                throw new ValidationException(validation.ToString());
+            return _bookingRepository.CreateBooking(booking);
         }
     }
 }
