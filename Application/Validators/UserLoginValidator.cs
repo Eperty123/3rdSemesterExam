@@ -8,15 +8,12 @@ using System.Threading.Tasks;
 
 namespace Application.Validators
 {
-    public class UserValidator : AbstractValidator<RegisterUserDTO>
+    public class UserLoginValidator : AbstractValidator<LoginUserDTO>
     {
-        public UserValidator()
+        public UserLoginValidator()
         {
             RuleFor(u => u.Username).NotEmpty();
             RuleFor(u => u.Password).NotEmpty();
-            RuleFor(u => u.Email).NotEmpty();
-            RuleFor(u => u.Usertype).NotEmpty();
-            RuleFor(u => u.Usertype).Matches("Coach|Client");
         }
     }
 }

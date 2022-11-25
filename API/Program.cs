@@ -20,6 +20,7 @@ builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssembli
 var mapper = new MapperConfiguration(config =>
 {
     config.CreateMap<RegisterUserDTO, User>();
+    config.CreateMap<LoginUserDTO, User>();
 }).CreateMapper();
 
 builder.Services.AddSingleton(mapper);
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite(
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddCors();
 
