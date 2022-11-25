@@ -21,6 +21,9 @@ namespace API.Controllers
             var foundUser = _userService.GetUserByUsername(loginUserDTO);
             if (foundUser != null)
             {
+                if (loginUserDTO.Password != foundUser.Password)
+                    return BadRequest("Wrong password.");
+
                 var token = new TokenDTO { Token = foundUser.Password };
                 return Ok(token);
             }
