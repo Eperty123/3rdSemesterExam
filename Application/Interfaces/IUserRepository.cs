@@ -12,9 +12,9 @@ namespace Application.Interfaces
     {
         List<User> ReadAllUsers();
         User CreateUser(User user);
-        User GetUserById(int id);
-        User GetUserByEmail(string email);
-        User GetUserByUsername(string username);
+        User ReadUserById(int id);
+        User ReadUserByEmail(string email);
+        User ReadUserByUsername(string username);
         User DeleteUser(int id);
         User UpdateUser(int id, User user);
         void RebuildDB();

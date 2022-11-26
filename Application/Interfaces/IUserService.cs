@@ -13,6 +13,7 @@ namespace Application.Interfaces
         List<User> GetAllUsers();
         User CreateUser(RegisterUserDTO dto);
         User GetUser(int id);
+        User GetUserByUsername(LoginUserDTO dto);
         User DeleteUser(int id);
         User UpdateUser(int id, User user);
         void RebuildDB();

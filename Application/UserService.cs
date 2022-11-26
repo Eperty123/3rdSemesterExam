@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
@@ -17,8 +18,9 @@ namespace Application
         private IUserRepository _userRepository;
         private IMapper _mapper;
         private IValidator<RegisterUserDTO> _registerUserValidator;
+        private IValidator<LoginUserDTO> _loginUserValidator;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<RegisterUserDTO> registerUserValidator)
+        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<RegisterUserDTO> registerUserValidator, IValidator<LoginUserDTO> loginUserValidator)
         {
             if (userRepository == null)
                 throw new ArgumentException("Missing repository");
@@ -26,6 +28,7 @@ namespace Application
             _userRepository = userRepository;
             _mapper = mapper;
             _registerUserValidator = registerUserValidator;
+            _loginUserValidator = loginUserValidator;
         }
 
         public User CreateUser(RegisterUserDTO dto)
@@ -35,12 +38,17 @@ namespace Application
             if (!validation.IsValid)
                 throw new ValidationException(validation.ToString());
 
+            // Hash the password to prevent plain text. Not super secure but should
+            // fullfill the basic security meassure.
+            dto.Password = dto.Password.HashPasswordBCrypt();
             return _userRepository.CreateUser(_mapper.Map<User>(dto));
         }
 
         public User DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.DeleteUser(id);
         }
 
         public List<User> GetAllUsers()
@@ -50,7 +58,9 @@ namespace Application
 
         public User GetUser(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.ReadUserById(id);
         }
 
         public User UpdateUser(int id, User user)
@@ -60,6 +70,28 @@ namespace Application
         public void RebuildDB()
         {
             _userRepository.RebuildDB();
+        }
+
+        public User GetUserByUsername(LoginUserDTO dto)
+        {
+            try
+            {
+                var validation = _loginUserValidator.Validate(dto);
+
+                if (!validation.IsValid)
+                    throw new ValidationException(validation.ToString());
+
+                var foundUser = _userRepository.ReadUserByUsername(dto.Username);
+
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(dto.Password))
+                    throw new ValidationException("Wrong login credentials");
+
+                return foundUser;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

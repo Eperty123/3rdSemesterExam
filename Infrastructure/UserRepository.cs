@@ -8,24 +8,24 @@ namespace Infrastructure
     {
         private DatabaseContext _context;
 
-        public UserRepository(DatabaseContext databaseContext) 
+        public UserRepository(DatabaseContext databaseContext)
         {
             _context = databaseContext;
-            
+
         }
 
         public User CreateUser(User user)
         {
             try
             {
-                GetUserByEmail(user.Email);
+                ReadUserByEmail(user.Email);
                 throw new Exception("This email is already in use");
             }
             catch (KeyNotFoundException)
             {
                 try
                 {
-                    GetUserByUsername(user.Username);
+                    ReadUserByUsername(user.Username);
                     throw new Exception("This username is already in use");
                 }
                 catch (KeyNotFoundException)
@@ -39,19 +39,28 @@ namespace Infrastructure
 
         public User DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
+            if (foundUser != null)
+            {
+                _context.UserTable.Remove(foundUser);
+                _context.SaveChanges();
+
+                return foundUser;
+            }
+
+            return null;
         }
 
-        public User GetUserById(int id)
+        public User ReadUserById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public User GetUserByEmail(string email)
+        public User ReadUserByEmail(string email)
         {
             return _context.UserTable.FirstOrDefault(u => u.Email == email) ?? throw new KeyNotFoundException("There was no user with email " + email);
         }
-        public User GetUserByUsername(string username)
+        public User ReadUserByUsername(string username)
         {
             return _context.UserTable.FirstOrDefault(u => u.Username == username) ?? throw new KeyNotFoundException("There was no user with username " + username);
         }
