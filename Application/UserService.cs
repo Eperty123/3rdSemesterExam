@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
@@ -37,6 +38,9 @@ namespace Application
             if (!validation.IsValid)
                 throw new ValidationException(validation.ToString());
 
+            // Hash the password to prevent plain text. Not super secure but should
+            // fullfill the basic security meassure.
+            dto.Password = dto.Password.HashPasswordBCrypt();
             return _userRepository.CreateUser(_mapper.Map<User>(dto));
         }
 
@@ -77,11 +81,16 @@ namespace Application
                 if (!validation.IsValid)
                     throw new ValidationException(validation.ToString());
 
-                return _userRepository.ReadUserByUsername(dto.Username);
+                var foundUser = _userRepository.ReadUserByUsername(dto.Username);
+
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(dto.Password))
+                    throw new ValidationException("Wrong login credentials");
+
+                return foundUser;
             }
-            catch (KeyNotFoundException)
+            catch (Exception)
             {
-                return null;
+                throw;
             }
         }
     }

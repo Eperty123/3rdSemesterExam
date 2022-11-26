@@ -1,5 +1,6 @@
 using Application;
 using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
@@ -111,18 +112,17 @@ namespace XunitTest
             userRepositoryMock.Verify(x => x.CreateUser(invalidUser), Times.Never);
         }
 
-        //Test 1.3 - Valid inputs
+        //Test 2.1 - Valid login credentials
         [Theory]
-        [InlineData("MartinK")]    //Valid client user
-        [InlineData("Charlie")]   //Valid coach user
-        public void GetValidUserByUsername(string username)
+        [InlineData("Charlie", "hackme")]    //Valid user
+        public void GetValidUserByUsername(string username, string password)
         {
             // Arrange
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
             IUserRepository repository = userRepositoryMock.Object;
 
-            User validUser = new User { Username = username };
-            LoginUserDTO validUserDTO = new LoginUserDTO { Username = username, Password = "test" };
+            User validUser = new User { Username = username, Password = PasswordHelper.HashPasswordBCrypt(password) };
+            LoginUserDTO validUserDTO = new LoginUserDTO { Username = username, Password = password };
 
             userRepositoryMock.Setup(x => x.ReadUserByUsername(username)).Returns(validUser);
 
@@ -139,50 +139,78 @@ namespace XunitTest
 
             // Assert
             Assert.Equal(validUser.Username, result.Username);
+            Assert.Equal(validUser.Password, result.Password);
             userRepositoryMock.Verify(x => x.ReadUserByUsername(username), Times.Once);
         }
 
+        //Test 2.2 - Invalid login credentials
         [Theory]
-        [InlineData(1, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is valid and not 0
-        [InlineData(2, "", "test@@yahoo.com", "hackme", "Client")] // Id is valid and not 0
-        public void DeleteValidUser(int id, string username, string email, string password, string usertype)
+        [InlineData("Charlie", "hackme")]    //Valid user
+        public void GetInvalidUserByUsername(string username, string password)
         {
             // Arrange
-            Mock<IUserRepository> mockRepo = new Mock<IUserRepository>();
-            IUserRepository repository = mockRepo.Object;
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+            IUserRepository repository = userRepositoryMock.Object;
 
-            IUserService service = new UserService(repository, null, null, null);
-            User fakeUser = new User { Id = id, Username = username, Email = email, Password = password, Usertype = usertype };
+            User validUser = new User { Username = username, Password = PasswordHelper.HashPasswordBCrypt("test") };
+            LoginUserDTO validUserDTO = new LoginUserDTO { Username = username, Password = password };
 
-            mockRepo.Setup(r => r.DeleteUser(id)).Returns(fakeUser);
+            userRepositoryMock.Setup(x => x.ReadUserByUsername(username)).Returns(validUser);
 
-            // Act
-            User result = service.DeleteUser(id);
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
+            mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(validUser);
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(fakeUser, result);
-            mockRepo.Verify(r => r.DeleteUser(id), Times.Once);
-        }
+            var registrationValidator = new UserRegistrationValidator();
+            var loginValidator = new UserLoginValidator();
 
-        [Theory]
-        [InlineData(-1, "", "test0@yahoo.com", "hackme", "Client")] // Id is invalid and not above 0
-        [InlineData(0, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is invalid and not above 0
-        public void DeleteInvalidUser(int id, string username, string email, string password, string usertype)
-        {
-            // Arrange
-            Mock<IUserRepository> mockRepo = new Mock<IUserRepository>();
-            IUserRepository repository = mockRepo.Object;
-
-            IUserService service = new UserService(repository, null, null, null);
-            User fakeUser = new User { Id = id, Username = username, Email = email, Password = password, Usertype = usertype };
-
-            mockRepo.Setup(r => r.DeleteUser(id)).Returns(fakeUser);
+            IUserService service = new UserService(repository, mockMapper.Object, registrationValidator, loginValidator);
 
             // Act + assert
-            Assert.Throws<ArgumentException>(() => service.DeleteUser(id));
-            mockRepo.Verify(r => r.DeleteUser(id), Times.Never);
+            Assert.Throws<ValidationException>(() => service.GetUserByUsername(validUserDTO)).Message.Equals("Wrong login credentials");
+            userRepositoryMock.Verify(x => x.ReadUserByUsername(username), Times.Once);
         }
+
+        //[Theory]
+        //[InlineData(1, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is valid and not 0
+        //[InlineData(2, "", "test@@yahoo.com", "hackme", "Client")] // Id is valid and not 0
+        //public void DeleteValidUser(int id, string username, string email, string password, string usertype)
+        //{
+        //    // Arrange
+        //    Mock<IUserRepository> mockRepo = new Mock<IUserRepository>();
+        //    IUserRepository repository = mockRepo.Object;
+
+        //    IUserService service = new UserService(repository, null, null, null);
+        //    User fakeUser = new User { Id = id, Username = username, Email = email, Password = password, Usertype = usertype };
+
+        //    mockRepo.Setup(r => r.DeleteUser(id)).Returns(fakeUser);
+
+        //    // Act
+        //    User result = service.DeleteUser(id);
+
+        //    // Assert
+        //    Assert.NotNull(result);
+        //    Assert.Equal(fakeUser, result);
+        //    mockRepo.Verify(r => r.DeleteUser(id), Times.Once);
+        //}
+
+        //[Theory]
+        //[InlineData(-1, "", "test0@yahoo.com", "hackme", "Client")] // Id is invalid and not above 0
+        //[InlineData(0, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is invalid and not above 0
+        //public void DeleteInvalidUser(int id, string username, string email, string password, string usertype)
+        //{
+        //    // Arrange
+        //    Mock<IUserRepository> mockRepo = new Mock<IUserRepository>();
+        //    IUserRepository repository = mockRepo.Object;
+
+        //    IUserService service = new UserService(repository, null, null, null);
+        //    User fakeUser = new User { Id = id, Username = username, Email = email, Password = password, Usertype = usertype };
+
+        //    mockRepo.Setup(r => r.DeleteUser(id)).Returns(fakeUser);
+
+        //    // Act + assert
+        //    Assert.Throws<ArgumentException>(() => service.DeleteUser(id));
+        //    mockRepo.Verify(r => r.DeleteUser(id), Times.Never);
+        //}
 
         //[Theory]
         //[InlineData(1, "penguinz0", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is valid and not 0

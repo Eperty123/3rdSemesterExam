@@ -32,17 +32,25 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite(
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 
 builder.Services.AddCors();
 
 var app = builder.Build();
+
+// Build an instance of the ServiceProvider to gain access to the different dependency injected classes.
+var builtService = builder.Services.BuildServiceProvider();
+
+var dbSeeder = builtService.GetService<IDbSeeder>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    dbSeeder.SeedDevelopment();
 }
+else dbSeeder.SeedProduction();
 
 app.UseCors(options =>
 {
