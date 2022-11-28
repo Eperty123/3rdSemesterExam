@@ -63,10 +63,12 @@ namespace Application
             return _userRepository.ReadUserById(id);
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, UpdateUserDTO dto)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+            return _userRepository.UpdateUser(id, _mapper.Map<User>(dto));
         }
+
         public void RebuildDB()
         {
             _userRepository.RebuildDB();

@@ -21,6 +21,7 @@ var mapper = new MapperConfiguration(config =>
 {
     config.CreateMap<RegisterUserDTO, User>();
     config.CreateMap<LoginUserDTO, User>();
+    config.CreateMap<UpdateUserDTO, User>();
 }).CreateMapper();
 
 builder.Services.AddSingleton(mapper);

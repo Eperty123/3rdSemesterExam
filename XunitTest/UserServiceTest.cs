@@ -170,6 +170,39 @@ namespace XunitTest
             userRepositoryMock.Verify(x => x.ReadUserByUsername(username), Times.Once);
         }
 
+        //Test 4.1 - Valid update user inputs
+        [Theory]
+        [InlineData(1, "Charlie", "penguinz0@yahoo.com", "hackme")]    //Valid user
+        [InlineData(2, "Charlie", "penguinz0@yahoo.com", "hackme1")]    //Valid user
+        public void UpdateValidUser(int id, string username, string email, string password)
+        {
+            // Arrange
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+            IUserRepository repository = userRepositoryMock.Object;
+
+            User validUser = new User { Id = id, Username = username, Password = PasswordHelper.HashPasswordBCrypt(password), Email = email };
+            UpdateUserDTO validUserDTO = new UpdateUserDTO { Username = username, Password = password, Email = email };
+
+            userRepositoryMock.Setup(x => x.UpdateUser(id, validUser)).Returns(validUser);
+
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
+            mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(validUser);
+
+            var registrationValidator = new UserRegistrationValidator();
+            var loginValidator = new UserLoginValidator();
+
+            IUserService service = new UserService(repository, mockMapper.Object, registrationValidator, loginValidator);
+
+            // Act
+            User result = service.UpdateUser(id, validUserDTO);
+
+            // Assert
+            Assert.NotNull(validUser);
+            Assert.Equal(validUser, result);
+            userRepositoryMock.Verify(x => x.UpdateUser(id, validUser), Times.Once);
+        }
+
+
         //[Theory]
         //[InlineData(1, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is valid and not 0
         //[InlineData(2, "", "test@@yahoo.com", "hackme", "Client")] // Id is valid and not 0
