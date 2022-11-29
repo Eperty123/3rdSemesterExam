@@ -10,6 +10,5 @@ namespace Domain
     {
         public int StartTime { get; set; }
         public int EndTime { get; set; }
-        public List<DayOfWeek> AvailableDays { get; set; }
     }
 }
