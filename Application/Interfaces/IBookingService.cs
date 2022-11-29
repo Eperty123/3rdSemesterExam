@@ -10,5 +10,6 @@ namespace Application.Interfaces
     public interface IBookingService
     {
         Booking CreateBooking(Booking booking);
+        Booking DeleteBooking(int id);
     }
 }

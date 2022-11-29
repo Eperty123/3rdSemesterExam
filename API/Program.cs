@@ -31,6 +31,9 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite(
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+
 builder.Services.AddCors();
 
 var app = builder.Build();

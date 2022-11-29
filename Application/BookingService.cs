@@ -28,5 +28,10 @@ namespace Application
                 throw new ValidationException(validation.ToString());
             return _bookingRepository.CreateBooking(booking);
         }
+
+        public Booking DeleteBooking(int id)
+        {
+            return _bookingRepository.DeleteBooking(id);
+        }
     }
 }
