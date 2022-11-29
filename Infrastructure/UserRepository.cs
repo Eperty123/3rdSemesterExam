@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Helpers;
+using Application.Interfaces;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,7 +73,21 @@ namespace Infrastructure
 
         public User UpdateUser(int id, User user)
         {
-            throw new NotImplementedException();
+            var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
+            if (foundUser != null)
+            {
+                //foundUser.Username = user.Username;
+                // Database user must always have their password hashed!
+                foundUser.Password = user.Password.HashPasswordBCrypt();
+                //foundUser.Email = user.Email;
+                //foundUser.Bookings = user.Bookings;
+                _context.UserTable.Update(foundUser);
+                _context.SaveChanges();
+
+                return foundUser;
+            }
+
+            return null;
         }
         public void RebuildDB()
         {

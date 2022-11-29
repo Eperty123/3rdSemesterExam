@@ -181,7 +181,7 @@ namespace XunitTest
             IUserRepository repository = userRepositoryMock.Object;
 
             User validUser = new User { Id = id, Username = username, Password = PasswordHelper.HashPasswordBCrypt(password), Email = email };
-            UpdateUserDTO validUserDTO = new UpdateUserDTO { Username = username, Password = password, Email = email };
+            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ };
 
             userRepositoryMock.Setup(x => x.UpdateUser(id, validUser)).Returns(validUser);
 
@@ -200,6 +200,33 @@ namespace XunitTest
             Assert.NotNull(validUser);
             Assert.Equal(validUser, result);
             userRepositoryMock.Verify(x => x.UpdateUser(id, validUser), Times.Once);
+        }
+
+        //Test 4.2 - Invalid update user inputs
+        [Theory]
+        [InlineData(-1, "Charlie", "penguinz0@yahoo.com", "hackme")]    // Invalid user
+        public void UpdateInvalidUser(int id, string username, string email, string password)
+        {
+            // Arrange
+            Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
+            IUserRepository repository = userRepositoryMock.Object;
+
+            User invalidUser = new User { Id = id, Username = username, Password = PasswordHelper.HashPasswordBCrypt(password), Email = email };
+            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ };
+
+            userRepositoryMock.Setup(x => x.UpdateUser(id, invalidUser)).Returns(invalidUser);
+
+            Mock<IMapper> mockMapper = new Mock<IMapper>();
+            mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(invalidUser);
+
+            var registrationValidator = new UserRegistrationValidator();
+            var loginValidator = new UserLoginValidator();
+
+            IUserService service = new UserService(repository, mockMapper.Object, registrationValidator, loginValidator);
+
+            // Act + assert
+            Assert.Throws<ArgumentException>(() => service.UpdateUser(id, validUserDTO));
+            userRepositoryMock.Verify(x => x.UpdateUser(id, invalidUser), Times.Never);
         }
 
 

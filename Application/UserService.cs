@@ -39,7 +39,7 @@ namespace Application
                 throw new ValidationException(validation.ToString());
 
             // Hash the password to prevent plain text. Not super secure but should
-            // fullfill the basic security meassure.
+            // fullfill the basic security requirement.
             dto.Password = dto.Password.HashPasswordBCrypt();
             return _userRepository.CreateUser(_mapper.Map<User>(dto));
         }
@@ -78,11 +78,6 @@ namespace Application
         {
             try
             {
-                var validation = _loginUserValidator.Validate(dto);
-
-                if (!validation.IsValid)
-                    throw new ValidationException(validation.ToString());
-
                 var foundUser = _userRepository.ReadUserByUsername(dto.Username);
 
                 if (!foundUser.Password.VerifyHashedPasswordBCrypt(dto.Password))
@@ -92,7 +87,7 @@ namespace Application
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
     }
