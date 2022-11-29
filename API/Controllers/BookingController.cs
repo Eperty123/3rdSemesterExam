@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,21 @@ namespace API.Controllers
         public BookingController(IBookingService bookingService)
         {
             _bookingService = bookingService;
+        }
+
+
+        [HttpPut]
+        public ActionResult<Coach> ChangeAvailableTimes(AvailableTimesDTO dto)
+        {
+            try
+            {
+                var result = _bookingService.ChangeAvailableTimes(dto);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]

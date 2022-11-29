@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Application.Validators;
 using Domain;
 using FluentValidation;
@@ -21,6 +22,12 @@ namespace Application
             _bookingRepository = repository;
             _bookingValidator = bookingValidator;
         }
+
+        public Coach ChangeAvailableTimes(AvailableTimesDTO dto)
+        {
+            return _bookingRepository.ChangeAvailableTimes(dto);
+        }
+
         public Booking CreateBooking(Booking booking)
         {
             var validation = _bookingValidator.Validate(booking);

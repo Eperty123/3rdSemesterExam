@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Domain;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,15 @@ namespace Infrastructure
         public BookingRepository(DatabaseContext context)
         {
             _context = context;
+        }
+
+        public Coach ChangeAvailableTimes(AvailableTimesDTO dto)
+        {
+            Coach coach = _context.CoachTable.Single(c => c.Id == dto.CoachId);
+            coach.StartTime = dto.StartTime;
+            coach.EndTime = dto.EndTime;
+            _context.SaveChanges();
+            return coach;
         }
 
         public Booking CreateBooking(Booking booking)
