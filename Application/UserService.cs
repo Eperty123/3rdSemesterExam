@@ -41,7 +41,8 @@ namespace Application
             // Hash the password to prevent plain text. Not super secure but should
             // fullfill the basic security requirement.
             dto.Password = dto.Password.HashPasswordBCrypt();
-            return _userRepository.CreateUser(_mapper.Map<User>(dto));
+            var userType = dto.Usertype;
+            return _userRepository.CreateUser(userType == "Client" ? _mapper.Map<Client>(dto) : _mapper.Map<Coach>(dto));
         }
 
         public User DeleteUser(int id)
