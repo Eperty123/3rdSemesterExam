@@ -172,18 +172,18 @@ namespace XunitTest
 
         //Test 4.1 - Valid update user inputs
         [Theory]
-        [InlineData(1, "Charlie", "penguinz0@yahoo.com", "hackme")]    //Valid user
-        [InlineData(2, "Charlie", "penguinz0@yahoo.com", "hackme1")]    //Valid user
-        public void UpdateValidUser(int id, string username, string email, string password)
+        [InlineData(1, "Charlie", "penguinz0@yahoo.com", "hackme", "hackme")]    //Valid user
+        [InlineData(2, "Charlie", "penguinz0@yahoo.com", "hackme1", "hackme1")]    //Valid user
+        public void UpdateValidUser(int id, string username, string email, string password, string oldPassword)
         {
             // Arrange
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
             IUserRepository repository = userRepositoryMock.Object;
 
             User validUser = new User { Id = id, Username = username, Password = PasswordHelper.HashPasswordBCrypt(password), Email = email };
-            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ };
+            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ OldPassword = oldPassword };
 
-            userRepositoryMock.Setup(x => x.UpdateUser(id, validUser)).Returns(validUser);
+            userRepositoryMock.Setup(x => x.UpdateUser(id, validUser, oldPassword)).Returns(validUser);
 
             Mock<IMapper> mockMapper = new Mock<IMapper>();
             mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(validUser);
@@ -199,22 +199,22 @@ namespace XunitTest
             // Assert
             Assert.NotNull(validUser);
             Assert.Equal(validUser, result);
-            userRepositoryMock.Verify(x => x.UpdateUser(id, validUser), Times.Once);
+            userRepositoryMock.Verify(x => x.UpdateUser(id, validUser, oldPassword), Times.Once);
         }
 
         //Test 4.2 - Invalid update user inputs
         [Theory]
-        [InlineData(-1, "Charlie", "penguinz0@yahoo.com", "hackme")]    // Invalid user
-        public void UpdateInvalidUser(int id, string username, string email, string password)
+        [InlineData(-1, "Charlie", "penguinz0@yahoo.com", "hackme", "hacke")]    // Invalid user
+        public void UpdateInvalidUser(int id, string username, string email, string password, string oldPassword)
         {
             // Arrange
             Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
             IUserRepository repository = userRepositoryMock.Object;
 
             User invalidUser = new User { Id = id, Username = username, Password = PasswordHelper.HashPasswordBCrypt(password), Email = email };
-            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ };
+            UpdateUserDTO validUserDTO = new UpdateUserDTO { /*Username = username,*/ Password = password, /*Email = email*/ OldPassword = oldPassword };
 
-            userRepositoryMock.Setup(x => x.UpdateUser(id, invalidUser)).Returns(invalidUser);
+            userRepositoryMock.Setup(x => x.UpdateUser(id, invalidUser, oldPassword)).Returns(invalidUser);
 
             Mock<IMapper> mockMapper = new Mock<IMapper>();
             mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(invalidUser);
@@ -226,7 +226,7 @@ namespace XunitTest
 
             // Act + assert
             Assert.Throws<ArgumentException>(() => service.UpdateUser(id, validUserDTO));
-            userRepositoryMock.Verify(x => x.UpdateUser(id, invalidUser), Times.Never);
+            userRepositoryMock.Verify(x => x.UpdateUser(id, invalidUser, oldPassword), Times.Never);
         }
 
 
