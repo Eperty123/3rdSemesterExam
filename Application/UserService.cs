@@ -67,7 +67,7 @@ namespace Application
         public User UpdateUser(int id, UpdateUserDTO dto)
         {
             if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
-            return _userRepository.UpdateUser(id, _mapper.Map<User>(dto));
+            return _userRepository.UpdateUser(id, _mapper.Map<User>(dto), dto.OldPassword);
         }
 
         public void RebuildDB()

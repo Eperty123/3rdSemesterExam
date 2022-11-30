@@ -71,11 +71,14 @@ namespace Infrastructure
             throw new NotImplementedException();
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, User user, string oldPassword)
         {
             var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
             if (foundUser != null)
             {
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(oldPassword))
+                    throw new ArgumentException("Entered password does not match");
+
                 //foundUser.Username = user.Username;
                 // Database user must always have their password hashed!
                 foundUser.Password = user.Password.HashPasswordBCrypt();
