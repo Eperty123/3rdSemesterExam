@@ -56,7 +56,18 @@ namespace XunitTest
             IUserRepository repository = userRepositoryMock.Object;
 
             RegisterUserDTO validUserDTO = new RegisterUserDTO { Username = username, Email = email, Password = password, Usertype = usertype };
-            User validUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
+            User validUser = null;
+
+            switch (usertype)
+            {
+                case "Client":
+                    validUser = new Client { Username = username, Email = email, Password = password, Usertype = usertype };
+                    break;
+
+                case "Coach":
+                    validUser = new Coach { Username = username, Email = email, Password = password, Usertype = usertype };
+                    break;
+            }
 
             userRepositoryMock.Setup(x => x.CreateUser(validUser)).Returns(validUser);
 

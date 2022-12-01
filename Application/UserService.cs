@@ -88,7 +88,7 @@ namespace Application
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
         }
     }
