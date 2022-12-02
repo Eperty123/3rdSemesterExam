@@ -54,7 +54,7 @@ namespace Infrastructure
 
         public User ReadUserById(int id)
         {
-            throw new NotImplementedException();
+            return _context.UserTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
 
         public User ReadUserByEmail(string email)

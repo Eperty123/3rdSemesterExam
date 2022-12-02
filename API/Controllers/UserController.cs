@@ -66,6 +66,19 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<User> GetUserById(int id)
+        {
+            try
+            {
+                return Ok(_userService.GetUser(id));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         //[HttpGet]
         //public void RebuildDB()
         //{
