@@ -68,7 +68,7 @@ namespace Infrastructure
 
         public List<User> ReadAllUsers()
         {
-            throw new NotImplementedException();
+            return _context.UserTable.ToList();
         }
 
         public User UpdateUser(int id, User user, string oldPassword)
