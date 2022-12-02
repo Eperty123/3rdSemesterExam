@@ -16,7 +16,7 @@ namespace Application.Interfaces
         User ReadUserByEmail(string email);
         User ReadUserByUsername(string username);
         User DeleteUser(int id);
-        User UpdateUser(int id, User user);
+        User UpdateUser(int id, User user, string oldPassword);
         void RebuildDB();
     }
 }

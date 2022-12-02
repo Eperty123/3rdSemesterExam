@@ -21,6 +21,16 @@ var mapper = new MapperConfiguration(config =>
 {
     config.CreateMap<RegisterUserDTO, User>();
     config.CreateMap<LoginUserDTO, User>();
+    config.CreateMap<UpdateUserDTO, User>();
+
+    config.CreateMap<RegisterUserDTO, Client>();
+    config.CreateMap<RegisterUserDTO, Coach>();
+
+    config.CreateMap<LoginUserDTO, Client>();
+    config.CreateMap<LoginUserDTO, Coach>();
+
+    config.CreateMap<UpdateUserDTO, Client>();
+    config.CreateMap<UpdateUserDTO, Coach>();
 }).CreateMapper();
 
 builder.Services.AddSingleton(mapper);
@@ -32,10 +42,11 @@ builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite(
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+
+builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 
 builder.Services.AddCors();
 

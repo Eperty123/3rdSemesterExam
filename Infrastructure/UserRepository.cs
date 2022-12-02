@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Helpers;
+using Application.Interfaces;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,7 +54,7 @@ namespace Infrastructure
 
         public User ReadUserById(int id)
         {
-            throw new NotImplementedException();
+            return _context.UserTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
 
         public User ReadUserByEmail(string email)
@@ -67,12 +68,29 @@ namespace Infrastructure
 
         public List<User> ReadAllUsers()
         {
-            throw new NotImplementedException();
+            return _context.UserTable.ToList();
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, User user, string oldPassword)
         {
-            throw new NotImplementedException();
+            var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
+            if (foundUser != null)
+            {
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(oldPassword))
+                    throw new ArgumentException("Entered password does not match");
+
+                //foundUser.Username = user.Username;
+                // Database user must always have their password hashed!
+                foundUser.Password = user.Password.HashPasswordBCrypt();
+                //foundUser.Email = user.Email;
+                //foundUser.Bookings = user.Bookings;
+                _context.UserTable.Update(foundUser);
+                _context.SaveChanges();
+
+                return foundUser;
+            }
+
+            return null;
         }
         public void RebuildDB()
         {

@@ -39,9 +39,10 @@ namespace Application
                 throw new ValidationException(validation.ToString());
 
             // Hash the password to prevent plain text. Not super secure but should
-            // fullfill the basic security meassure.
+            // fullfill the basic security requirement.
             dto.Password = dto.Password.HashPasswordBCrypt();
-            return _userRepository.CreateUser(_mapper.Map<User>(dto));
+            var userType = dto.Usertype;
+            return _userRepository.CreateUser(userType == "Client" ? _mapper.Map<Client>(dto) : _mapper.Map<Coach>(dto));
         }
 
         public User DeleteUser(int id)
@@ -53,7 +54,7 @@ namespace Application
 
         public List<User> GetAllUsers()
         {
-            throw new NotImplementedException();
+            return _userRepository.ReadAllUsers();
         }
 
         public User GetUser(int id)
@@ -63,10 +64,12 @@ namespace Application
             return _userRepository.ReadUserById(id);
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, UpdateUserDTO dto)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+            return _userRepository.UpdateUser(id, _mapper.Map<User>(dto), dto.OldPassword);
         }
+
         public void RebuildDB()
         {
             _userRepository.RebuildDB();
@@ -76,11 +79,6 @@ namespace Application
         {
             try
             {
-                var validation = _loginUserValidator.Validate(dto);
-
-                if (!validation.IsValid)
-                    throw new ValidationException(validation.ToString());
-
                 var foundUser = _userRepository.ReadUserByUsername(dto.Username);
 
                 if (!foundUser.Password.VerifyHashedPasswordBCrypt(dto.Password))
