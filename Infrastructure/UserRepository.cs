@@ -1,4 +1,7 @@
 ﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Helpers;
+using Application.Interfaces;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,12 +66,26 @@ namespace Infrastructure
 
         public User UpdateUser(int id, User user)
         {
-            throw new NotImplementedException();
+            var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
+            if (foundUser != null)
+            {
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(oldPassword))
+                    throw new ArgumentException("Entered password does not match");
+
+                // Database user must always have their password hashed!
+                foundUser.Password = user.Password.HashPasswordBCrypt();
+                _context.UserTable.Update(foundUser);
+                _context.SaveChanges();
+
+                return foundUser;
+            }
+
+            return null;
         }
-        public void RebuildDB()
+
+        public Coach ReadCoachById(int id)
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+            return _context.CoachTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
     }
 }

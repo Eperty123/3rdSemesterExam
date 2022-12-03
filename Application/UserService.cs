@@ -57,9 +57,29 @@ namespace Application
         {
             throw new NotImplementedException();
         }
-        public void RebuildDB()
+
+        public User GetUserByUsername(LoginUserDTO dto)
         {
-            _userRepository.RebuildDB();
+            try
+            {
+                var foundUser = _userRepository.ReadUserByUsername(dto.Username);
+
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(dto.Password))
+                    throw new ValidationException("Wrong login credentials");
+
+                return foundUser;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public Coach GetCoach(int id)
+        {
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.ReadCoachById(id);
         }
     }
 }
