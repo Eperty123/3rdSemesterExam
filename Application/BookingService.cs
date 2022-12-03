@@ -40,5 +40,10 @@ namespace Application
         {
             return _bookingRepository.DeleteBooking(id);
         }
+
+        public Booking GetBooking(int id)
+        {
+            return _bookingRepository.ReadBooking(id);
+        }
     }
 }

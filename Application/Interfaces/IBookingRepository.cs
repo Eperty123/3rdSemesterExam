@@ -12,6 +12,7 @@ namespace Application.Interfaces
     {
         Booking CreateBooking(Booking booking);
         Booking DeleteBooking(int id);
+        Booking ReadBooking(int id);
         Coach ChangeAvailableTimes(AvailableTimesDTO dto);
     }
 }
