@@ -240,6 +240,31 @@ namespace XunitTest
             userRepositoryMock.Verify(x => x.UpdateUser(id, invalidUser, oldPassword), Times.Never);
         }
 
+        [Fact]
+        public void GetAllUsers()
+        {
+            // Arrange
+            Mock<IUserRepository> mockRepo = new Mock<IUserRepository>();
+            IUserRepository repo = mockRepo.Object;
+
+            var fakeRepo = new User[]
+            {
+                new User { Id = 1, Email = "email@email.com", Username = "test", Password = "test", Usertype = "Coach"},
+            };
+
+            mockRepo.Setup(r => r.ReadAllUsers()).Returns(fakeRepo.ToList());
+
+            IUserService service = new UserService(repo, null, null, null);
+
+            // Act
+            var result = service.GetAllUsers();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Single(result);
+            mockRepo.Verify(r => r.ReadAllUsers(), Times.Once);
+        }
+
 
         //[Theory]
         //[InlineData(1, "", "penguinz0@yahoo.com", "hackme", "Coach")] // Id is valid and not 0

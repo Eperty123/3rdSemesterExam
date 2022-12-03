@@ -45,7 +45,7 @@ namespace Application
 
         public List<User> GetAllUsers()
         {
-            throw new NotImplementedException();
+            return _userRepository.ReadAllUsers();
         }
 
         public User GetUser(int id)

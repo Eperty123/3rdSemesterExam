@@ -54,9 +54,35 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public void RebuildDB()
+        public ActionResult<IEnumerable<User>> GetAllUsers()
         {
-            _userService.RebuildDB();
+            try
+            {
+                return Ok(_userService.GetAllUsers());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<User> GetUserById(int id)
+        {
+            try
+            {
+                return Ok(_userService.GetUser(id));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        //[HttpGet]
+        //public void RebuildDB()
+        //{
+        //    _userService.RebuildDB();
+        //}
     }
 }

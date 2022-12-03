@@ -47,7 +47,7 @@ namespace Infrastructure
 
         public User GetUserById(int id)
         {
-            throw new NotImplementedException();
+            return _context.UserTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
 
         public User GetUserByEmail(string email)
@@ -61,7 +61,7 @@ namespace Infrastructure
 
         public List<User> ReadAllUsers()
         {
-            throw new NotImplementedException();
+            return _context.UserTable.ToList();
         }
 
         public User UpdateUser(int id, User user)
