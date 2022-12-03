@@ -21,14 +21,14 @@ namespace Infrastructure
         {
             try
             {
-                GetUserByEmail(user.Email);
+                ReadUserByEmail(user.Email);
                 throw new Exception("This email is already in use");
             }
             catch (KeyNotFoundException)
             {
                 try
                 {
-                    GetUserByUsername(user.Username);
+                    ReadUserByUsername(user.Username);
                     throw new Exception("This username is already in use");
                 }
                 catch (KeyNotFoundException)
@@ -45,16 +45,16 @@ namespace Infrastructure
             throw new NotImplementedException();
         }
 
-        public User GetUserById(int id)
+        public User ReadUserById(int id)
         {
             return _context.UserTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
 
-        public User GetUserByEmail(string email)
+        public User ReadUserByEmail(string email)
         {
             return _context.UserTable.FirstOrDefault(u => u.Email == email) ?? throw new KeyNotFoundException("There was no user with email " + email);
         }
-        public User GetUserByUsername(string username)
+        public User ReadUserByUsername(string username)
         {
             return _context.UserTable.FirstOrDefault(u => u.Username == username) ?? throw new KeyNotFoundException("There was no user with username " + username);
         }
@@ -64,7 +64,7 @@ namespace Infrastructure
             return _context.UserTable.ToList();
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, User user, string oldPassword)
         {
             var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
             if (foundUser != null)

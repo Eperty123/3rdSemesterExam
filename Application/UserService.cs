@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
@@ -28,6 +29,7 @@ namespace Application
             _registerUserValidator = registerUserValidator;
         }
 
+
         public User CreateUser(RegisterUserDTO dto)
         {
             var validation = _registerUserValidator.Validate(dto);
@@ -35,12 +37,18 @@ namespace Application
             if (!validation.IsValid)
                 throw new ValidationException(validation.ToString());
 
-            return _userRepository.CreateUser(_mapper.Map<User>(dto));
+            // Hash the password to prevent plain text. Not super secure but should
+            // fullfill the basic security requirement.
+            dto.Password = dto.Password.HashPasswordBCrypt();
+            var userType = dto.Usertype;
+            return _userRepository.CreateUser(userType == "Client" ? _mapper.Map<Client>(dto) : _mapper.Map<Coach>(dto));
         }
 
         public User DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.DeleteUser(id);
         }
 
         public List<User> GetAllUsers()
@@ -50,12 +58,15 @@ namespace Application
 
         public User GetUser(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.ReadUserById(id);
         }
 
-        public User UpdateUser(int id, User user)
+        public User UpdateUser(int id, UpdateUserDTO dto)
         {
-            throw new NotImplementedException();
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+            return _userRepository.UpdateUser(id, _mapper.Map<User>(dto), dto.OldPassword);
         }
 
         public User GetUserByUsername(LoginUserDTO dto)
