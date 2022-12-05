@@ -78,5 +78,18 @@ namespace API.Controllers
                 return StatusCode(500, e.ToString());
             }
         }
+
+        [HttpGet()]
+        public ActionResult<Booking> GetAllBookings()
+        {
+            try
+            {
+                return Ok(_bookingService.GetAllBookings());
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.ToString());
+            }
+        }
     }
 }

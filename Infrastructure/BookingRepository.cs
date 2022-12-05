@@ -46,5 +46,10 @@ namespace Infrastructure
         {
             return _context.BookingTable.Find(id) ?? throw new KeyNotFoundException();
         }
+
+        public IEnumerable<Booking> ReadAllBookings()
+        {
+            return _context.BookingTable.ToList();
+        }
     }
 }

@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Booking DeleteBooking(int id);
         Booking GetBooking(int id);
         Coach ChangeAvailableTimes(AvailableTimesDTO dto);
+        IEnumerable<Booking> GetAllBookings();
     }
 }

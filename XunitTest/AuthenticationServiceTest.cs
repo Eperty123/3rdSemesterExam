@@ -57,9 +57,8 @@ namespace XunitTest
             mockMapper.Setup(x => x.Map<User>(validUserDTO)).Returns(validUser);
 
             var registrationValidator = new UserRegistrationValidator();
-            var loginValidator = new UserLoginValidator();
 
-            IUserService service = new UserService(repository, mockMapper.Object, registrationValidator, loginValidator);
+            IUserService service = new UserService(repository, mockMapper.Object, registrationValidator);
             IAuthenticationService authenticationService = new AuthenticationService(repository);
 
             // Act

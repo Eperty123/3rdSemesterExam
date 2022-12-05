@@ -53,12 +53,35 @@ namespace Infrastructure
                 ClientId = client.Id,
                 CoachId = coach1.Id,
                 Date = DateTime.Now,
-            }); ;
+            });
+
+            _bookingService.CreateBooking(new Booking
+            {
+                Client = (Client)client,
+                Coach = (Coach)coach1,
+                ClientId = client.Id,
+                CoachId = coach1.Id,
+                Date = new DateTime(2022, 12, 8, 16, 0, 0),
+            });
+
+            _bookingService.ChangeAvailableTimes(new Application.DTOs.AvailableTimesDTO
+            {
+                CoachId = coach1.Id,
+                StartTime = "08:00",
+                EndTime = "16:00",
+            });
+
+            _bookingService.ChangeAvailableTimes(new Application.DTOs.AvailableTimesDTO
+            {
+                CoachId = coach2.Id,
+                StartTime = "08:00",
+                EndTime = "18:00",
+            });
         }
 
         public void SeedProduction()
-        {
-            _databaseContext.Database.EnsureCreated();
-        }
+{
+    _databaseContext.Database.EnsureCreated();
+}
     }
 }

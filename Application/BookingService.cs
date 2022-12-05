@@ -45,5 +45,10 @@ namespace Application
         {
             return _bookingRepository.ReadBooking(id);
         }
+
+        public IEnumerable<Booking> GetAllBookings()
+        {
+            return _bookingRepository.ReadAllBookings();
+        }
     }
 }
