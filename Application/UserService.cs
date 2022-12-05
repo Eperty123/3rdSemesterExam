@@ -18,9 +18,8 @@ namespace Application
         private IUserRepository _userRepository;
         private IMapper _mapper;
         private IValidator<RegisterUserDTO> _registerUserValidator;
-        private IValidator<LoginUserDTO> _loginUserValidator;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<RegisterUserDTO> registerUserValidator, IValidator<LoginUserDTO> loginUserValidator)
+        public UserService(IUserRepository userRepository, IMapper mapper, IValidator<RegisterUserDTO> registerUserValidator)
         {
             if (userRepository == null)
                 throw new ArgumentException("Missing repository");
@@ -28,8 +27,8 @@ namespace Application
             _userRepository = userRepository;
             _mapper = mapper;
             _registerUserValidator = registerUserValidator;
-            _loginUserValidator = loginUserValidator;
         }
+
 
         public User CreateUser(RegisterUserDTO dto)
         {
@@ -70,11 +69,6 @@ namespace Application
             return _userRepository.UpdateUser(id, _mapper.Map<User>(dto), dto.OldPassword);
         }
 
-        public void RebuildDB()
-        {
-            _userRepository.RebuildDB();
-        }
-
         public User GetUserByUsername(LoginUserDTO dto)
         {
             try
@@ -90,6 +84,13 @@ namespace Application
             {
                 throw;
             }
+        }
+
+        public Coach GetCoach(int id)
+        {
+            if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");
+
+            return _userRepository.ReadCoachById(id);
         }
     }
 }

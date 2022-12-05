@@ -79,10 +79,18 @@ namespace API.Controllers
             }
         }
 
-        //[HttpGet]
-        //public void RebuildDB()
-        //{
-        //    _userService.RebuildDB();
-        //}
+
+        [HttpGet("coach/{id}")]
+        public ActionResult<Coach> GetCoachById(int id)
+        {
+            try
+            {
+                return Ok(_userService.GetCoach(id));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

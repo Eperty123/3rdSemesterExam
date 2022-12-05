@@ -21,8 +21,8 @@ namespace Infrastructure
         public Coach ChangeAvailableTimes(AvailableTimesDTO dto)
         {
             Coach coach = _context.CoachTable.Single(c => c.Id == dto.CoachId);
-            coach.StartTime = dto.StartTime;
-            coach.EndTime = dto.EndTime;
+            coach.StartTime = TimeOnly.Parse(dto.StartTime);
+            coach.EndTime = TimeOnly.Parse(dto.EndTime);
             _context.SaveChanges();
             return coach;
         }
@@ -40,6 +40,16 @@ namespace Infrastructure
             _context.BookingTable.Remove(bookingToDelete);
             _context.SaveChanges();
             return bookingToDelete;
+        }
+
+        public Booking ReadBooking(int id)
+        {
+            return _context.BookingTable.Find(id) ?? throw new KeyNotFoundException();
+        }
+
+        public IEnumerable<Booking> ReadAllBookings()
+        {
+            return _context.BookingTable.ToList();
         }
     }
 }

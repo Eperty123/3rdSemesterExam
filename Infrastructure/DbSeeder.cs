@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Domain;
 
 namespace Infrastructure
 {
@@ -6,11 +7,13 @@ namespace Infrastructure
     {
         private readonly DatabaseContext _databaseContext;
         private readonly IUserService _userService;
+        private readonly IBookingService _bookingService;
 
-        public DbSeeder(DatabaseContext context, IUserService userService)
+        public DbSeeder(DatabaseContext context, IUserService userService, IBookingService bookingService)
         {
             _databaseContext = context;
             _userService = userService;
+            _bookingService = bookingService;
         }
 
 
@@ -19,7 +22,7 @@ namespace Infrastructure
             _databaseContext.Database.EnsureDeleted();
             _databaseContext.Database.EnsureCreated();
 
-            _userService.CreateUser(new Application.DTOs.RegisterUserDTO
+            var coach1 = _userService.CreateUser(new Application.DTOs.RegisterUserDTO
             {
                 Email = "carlo@easv.dk",
                 Username = "carlo",
@@ -27,7 +30,7 @@ namespace Infrastructure
                 Usertype = "Coach",
             });
 
-            _userService.CreateUser(new Application.DTOs.RegisterUserDTO
+            var coach2 = _userService.CreateUser(new Application.DTOs.RegisterUserDTO
             {
                 Email = "annso@easv.dk",
                 Username = "annso",
@@ -35,18 +38,50 @@ namespace Infrastructure
                 Usertype = "Coach",
             });
 
-            _userService.CreateUser(new Application.DTOs.RegisterUserDTO
+            var client = _userService.CreateUser(new Application.DTOs.RegisterUserDTO
             {
                 Email = "client@easv.dk",
                 Username = "client",
                 Password = "dev",
                 Usertype = "Client",
             });
+
+            _bookingService.CreateBooking(new Booking
+            {
+                Client = (Client)client,
+                Coach = (Coach)coach1,
+                ClientId = client.Id,
+                CoachId = coach1.Id,
+                Date = DateTime.Now,
+            });
+
+            _bookingService.CreateBooking(new Booking
+            {
+                Client = (Client)client,
+                Coach = (Coach)coach1,
+                ClientId = client.Id,
+                CoachId = coach1.Id,
+                Date = new DateTime(2022, 12, 8, 16, 0, 0),
+            });
+
+            _bookingService.ChangeAvailableTimes(new Application.DTOs.AvailableTimesDTO
+            {
+                CoachId = coach1.Id,
+                StartTime = "08:00",
+                EndTime = "16:00",
+            });
+
+            _bookingService.ChangeAvailableTimes(new Application.DTOs.AvailableTimesDTO
+            {
+                CoachId = coach2.Id,
+                StartTime = "08:00",
+                EndTime = "18:00",
+            });
         }
 
         public void SeedProduction()
-        {
-            _databaseContext.Database.EnsureCreated();
-        }
+{
+    _databaseContext.Database.EnsureCreated();
+}
     }
 }

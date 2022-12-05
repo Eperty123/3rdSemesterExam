@@ -16,6 +16,7 @@ namespace Application.Interfaces
         User GetUserByUsername(LoginUserDTO dto);
         User DeleteUser(int id);
         User UpdateUser(int id, UpdateUserDTO dto);
-        void RebuildDB();
+
+        Coach GetCoach(int id);
     }
 }

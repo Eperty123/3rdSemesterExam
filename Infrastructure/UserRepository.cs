@@ -1,4 +1,6 @@
-﻿using Application.Helpers;
+﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
 using Domain;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +11,10 @@ namespace Infrastructure
     {
         private DatabaseContext _context;
 
-        public UserRepository(DatabaseContext databaseContext)
+        public UserRepository(DatabaseContext databaseContext) 
         {
             _context = databaseContext;
-
+            
         }
 
         public User CreateUser(User user)
@@ -40,16 +42,7 @@ namespace Infrastructure
 
         public User DeleteUser(int id)
         {
-            var foundUser = _context.UserTable.FirstOrDefault(x => x.Id == id);
-            if (foundUser != null)
-            {
-                _context.UserTable.Remove(foundUser);
-                _context.SaveChanges();
-
-                return foundUser;
-            }
-
-            return null;
+            throw new NotImplementedException();
         }
 
         public User ReadUserById(int id)
@@ -79,11 +72,8 @@ namespace Infrastructure
                 if (!foundUser.Password.VerifyHashedPasswordBCrypt(oldPassword))
                     throw new ArgumentException("Entered password does not match");
 
-                //foundUser.Username = user.Username;
                 // Database user must always have their password hashed!
                 foundUser.Password = user.Password.HashPasswordBCrypt();
-                //foundUser.Email = user.Email;
-                //foundUser.Bookings = user.Bookings;
                 _context.UserTable.Update(foundUser);
                 _context.SaveChanges();
 
@@ -92,10 +82,10 @@ namespace Infrastructure
 
             return null;
         }
-        public void RebuildDB()
+
+        public Coach ReadCoachById(int id)
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+            return _context.CoachTable.FirstOrDefault(u => u.Id == id) ?? throw new KeyNotFoundException("There was no user with id " + id);
         }
     }
 }

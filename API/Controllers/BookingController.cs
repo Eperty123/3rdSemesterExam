@@ -61,5 +61,35 @@ namespace API.Controllers
                 return StatusCode(500, e.ToString());
             }
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<Booking> GetBooking(int id)
+        {
+            try
+            {
+                return Ok(_bookingService.GetBooking(id));
+            }
+            catch (KeyNotFoundException e)
+            {
+                return NotFound("No booking found with ID " + id);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.ToString());
+            }
+        }
+
+        [HttpGet()]
+        public ActionResult<Booking> GetAllBookings()
+        {
+            try
+            {
+                return Ok(_bookingService.GetAllBookings());
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.ToString());
+            }
+        }
     }
 }

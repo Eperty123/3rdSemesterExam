@@ -17,6 +17,7 @@ namespace Application.Interfaces
         User ReadUserByUsername(string username);
         User DeleteUser(int id);
         User UpdateUser(int id, User user, string oldPassword);
-        void RebuildDB();
+
+        Coach ReadCoachById(int id);
     }
 }

@@ -21,7 +21,7 @@ namespace API.Controllers
             var foundUser = _userService.GetUserByUsername(loginUserDTO);
             if (foundUser != null)
             {
-                var token = new TokenDTO { Token = foundUser.Password, UserId = foundUser.Id };
+                var token = new TokenDTO { Token = foundUser.Password, UserId = foundUser.Id, UserType = foundUser.Usertype };
                 return Ok(token);
             }
 
