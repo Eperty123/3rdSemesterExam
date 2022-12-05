@@ -15,7 +15,7 @@ namespace Application.Validators
             RuleFor(b => b.CoachId).GreaterThan(0);
             RuleFor(b => b.ClientId).GreaterThanOrEqualTo(0);
             RuleFor(b => b.CoachId).NotEqual(b => b.ClientId);
-            //RuleFor(b => b.Date).GreaterThan(DateTime.Now);
+            RuleFor(b => b.Date).GreaterThanOrEqualTo(DateTime.Now);
         }
     }
 }
