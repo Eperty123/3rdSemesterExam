@@ -11,6 +11,8 @@ namespace Application.Interfaces
     public interface IUserRepository
     {
         List<User> ReadAllUsers();
+        List<Coach> ReadAllCoaches();
+        List<Client> ReadAllClients();
         User CreateUser(User user);
         User ReadUserById(int id);
         User ReadUserByEmail(string email);

@@ -58,10 +58,10 @@ namespace Infrastructure
             _bookingService.CreateBooking(new Booking
             {
                 Client = (Client)client,
-                Coach = (Coach)coach1,
+                Coach = (Coach)coach2,
                 ClientId = client.Id,
-                CoachId = coach1.Id,
-                Date = new DateTime(2022, 12, 8, 16, 0, 0),
+                CoachId = coach2.Id,
+                Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day),
             });
 
             _bookingService.ChangeAvailableTimes(new Application.DTOs.AvailableTimesDTO
