@@ -11,6 +11,8 @@ namespace Application.Interfaces
     public interface IUserService
     {
         List<User> GetAllUsers();
+        List<Coach> GetAllCoaches();
+        List<Client> GetAllClients();
         User CreateUser(RegisterUserDTO dto);
         User GetUser(int id);
         User GetUserByUsername(LoginUserDTO dto);

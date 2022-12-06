@@ -56,6 +56,17 @@ namespace Application
             return _userRepository.ReadAllUsers();
         }
 
+        public List<Coach> GetAllCoaches()
+        {
+            return _userRepository.ReadAllCoaches();
+        }
+
+        public List<Client> GetAllClients()
+        {
+            return _userRepository.ReadAllClients();
+        }
+
+
         public User GetUser(int id)
         {
             if (id <= 0) throw new ArgumentException("The id cannot be 0 or lower!");

@@ -66,6 +66,32 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("coaches")]
+        public ActionResult<IEnumerable<User>> GetAllCoaches()
+        {
+            try
+            {
+                return Ok(_userService.GetAllCoaches());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("clients")]
+        public ActionResult<IEnumerable<User>> GetAllClients()
+        {
+            try
+            {
+                return Ok(_userService.GetAllClients());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public ActionResult<User> GetUserById(int id)
         {

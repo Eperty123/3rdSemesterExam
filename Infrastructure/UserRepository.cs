@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-﻿using Application.DTOs;
+using Application.DTOs;
 using Application.Helpers;
 using Application.Interfaces;
 using Domain;
@@ -11,10 +11,10 @@ namespace Infrastructure
     {
         private DatabaseContext _context;
 
-        public UserRepository(DatabaseContext databaseContext) 
+        public UserRepository(DatabaseContext databaseContext)
         {
             _context = databaseContext;
-            
+
         }
 
         public User CreateUser(User user)
@@ -62,6 +62,16 @@ namespace Infrastructure
         public List<User> ReadAllUsers()
         {
             return _context.UserTable.ToList();
+        }
+
+        public List<Coach> ReadAllCoaches()
+        {
+            return _context.CoachTable.ToList();
+        }
+
+        public List<Client> ReadAllClients()
+        {
+            return _context.ClientTable.ToList();
         }
 
         public User UpdateUser(int id, User user, string oldPassword)

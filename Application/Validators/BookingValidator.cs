@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 
 namespace Application.Validators
 {
-    public class BookingValidator :AbstractValidator<Booking>
+    public class BookingValidator : AbstractValidator<Booking>
     {
         public BookingValidator()
         {
             RuleFor(b => b.CoachId).GreaterThan(0);
             RuleFor(b => b.ClientId).GreaterThanOrEqualTo(0);
             RuleFor(b => b.CoachId).NotEqual(b => b.ClientId);
-            RuleFor(b => b.Date).GreaterThanOrEqualTo(DateTime.Now);
+
+            // Date must be on the same day or newer.
+            var date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            RuleFor(b => b.Date).GreaterThanOrEqualTo(date);
         }
     }
 }
