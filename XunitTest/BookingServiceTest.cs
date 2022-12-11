@@ -59,7 +59,7 @@ namespace XunitTest
             Mock<IBookingRepository> mockRepository = new Mock<IBookingRepository>();
             IBookingRepository repository = mockRepository.Object;
 
-            Booking validBooking = new Booking() { CoachId = 1, Date = DateTime.Now.AddHours(1)};
+            Booking validBooking = new Booking() { CoachId = 1, Date = DateTime.Now.AddHours(1) };
 
             mockRepository.Setup(x => x.CreateBooking(validBooking)).Returns(validBooking);
 
@@ -75,22 +75,23 @@ namespace XunitTest
 
         //Test 3.4
         [Theory]
-        [InlineData(0, 1)]
-        [InlineData(1, -1)]
-        public void CreateInvalidNewBooking(int coachId, int hoursToAdd)
+        [InlineData(0, 1, typeof(ValidationException))]
+        [InlineData(1, 5, typeof(ValidationException))]
+        public void CreateInvalidNewBooking(int coachId, int day, Type exceptionType)
         {
             //Arrange
             Mock<IBookingRepository> mockRepository = new Mock<IBookingRepository>();
             IBookingRepository repository = mockRepository.Object;
 
-            Booking invalidBooking = new Booking() { CoachId = coachId, Date = DateTime.Now.AddHours(hoursToAdd) };
+            Booking invalidBooking = new Booking() { CoachId = coachId, Date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, day) };
 
             mockRepository.Setup(x => x.CreateBooking(invalidBooking)).Returns(invalidBooking);
 
             IBookingService service = new BookingService(repository, _bookingValidator);
 
             //Act + Assert
-            Assert.Throws<ValidationException>(() => service.CreateBooking(invalidBooking));
+            var exception = Assert.Throws(exceptionType, () => service.CreateBooking(invalidBooking));
+            Assert.IsType(exceptionType, exception);
 
             mockRepository.Verify(x => x.CreateBooking(invalidBooking), Times.Never);
         }

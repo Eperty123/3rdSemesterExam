@@ -84,6 +84,7 @@ namespace Infrastructure
 
                 // Database user must always have their password hashed!
                 foundUser.Password = user.Password.HashPasswordBCrypt();
+                foundUser.Description = user.Description;
                 _context.UserTable.Update(foundUser);
                 _context.SaveChanges();
 
