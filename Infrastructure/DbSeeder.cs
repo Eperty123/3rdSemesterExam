@@ -28,6 +28,7 @@ namespace Infrastructure
                 Username = "carlo",
                 Password = "dev",
                 Usertype = "Coach",
+                Description = "I coach in pretty much every game out there."
             });
 
             var coach2 = _userService.CreateUser(new Application.DTOs.RegisterUserDTO
@@ -36,6 +37,7 @@ namespace Infrastructure
                 Username = "annso",
                 Password = "dev",
                 Usertype = "Coach",
+                Description = "I coach Heart Stone and League of Legends."
             });
 
             var client = _userService.CreateUser(new Application.DTOs.RegisterUserDTO
@@ -44,6 +46,7 @@ namespace Infrastructure
                 Username = "client",
                 Password = "dev",
                 Usertype = "Client",
+                Description = "I'm just your typical client."
             });
 
             _bookingService.CreateBooking(new Booking
