@@ -2,10 +2,12 @@ using Application.DTOs;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase
@@ -17,6 +19,7 @@ namespace API.Controllers
             _userService = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public ActionResult<User> CreateUser(RegisterUserDTO dto)
         {
@@ -53,6 +56,7 @@ namespace API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult<IEnumerable<User>> GetAllUsers()
         {
@@ -66,6 +70,7 @@ namespace API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("coaches")]
         public ActionResult<IEnumerable<User>> GetAllCoaches()
         {
@@ -79,6 +84,7 @@ namespace API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("clients")]
         public ActionResult<IEnumerable<User>> GetAllClients()
         {
@@ -92,6 +98,7 @@ namespace API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public ActionResult<User> GetUserById(int id)
         {
@@ -106,6 +113,7 @@ namespace API.Controllers
         }
 
 
+        [AllowAnonymous]
         [HttpGet("coach/{id}")]
         public ActionResult<Coach> GetCoachById(int id)
         {

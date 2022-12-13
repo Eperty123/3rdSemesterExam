@@ -4,7 +4,7 @@ namespace Application.Interfaces
 {
     public interface IAuthenticationService
     {
-        string Register(RegisterUserDTO registerUserDTO);
-        string Login(LoginUserDTO loginUserDTO);
+        TokenDTO Register(RegisterUserDTO registerUserDTO);
+        TokenDTO Login(LoginUserDTO loginUserDTO);
     }
 }

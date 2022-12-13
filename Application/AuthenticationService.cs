@@ -1,31 +1,71 @@
 ﻿using Application.DTOs;
+using Application.Helpers;
 using Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using AutoMapper;
+using Domain;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Application
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUserRepository _userRepository;
+        private IMapper _mapper;
+        private JwtConfig _jwtConfig;
 
-        public AuthenticationService(IUserRepository userRepository)
+        public AuthenticationService(IUserRepository userRepository, IMapper mapper, JwtConfig jwtConfig)
         {
             if (userRepository == null) throw new ArgumentException("Missing repository");
             _userRepository = userRepository;
+            _mapper = mapper;
+            _jwtConfig = jwtConfig;
         }
 
-        public string Login(LoginUserDTO loginUserDTO)
+        public AuthenticationService(IUserRepository userRepository, IMapper mapper, IOptions<JwtConfig> jwtConfig)
         {
-            throw new NotImplementedException();
+            if (userRepository == null) throw new ArgumentException("Missing repository");
+            _userRepository = userRepository;
+            _mapper = mapper;
+            _jwtConfig = jwtConfig.Value;
         }
 
-        public string Register(RegisterUserDTO registerUserDTO)
+        public TokenDTO Login(LoginUserDTO loginUserDTO)
         {
-            throw new NotImplementedException();
+            var foundUser = _userRepository.ReadUserByUsername(loginUserDTO.Username);
+            if (foundUser != null)
+            {
+                return new TokenDTO { Token = GenerateToken(foundUser), UserId = foundUser.Id, UserType = foundUser.Usertype };
+            }
+
+            throw new KeyNotFoundException("User not found.");
+        }
+
+        public TokenDTO Register(RegisterUserDTO registerUserDTO)
+        {
+            var createdUser = _userRepository.CreateUser(_mapper.Map<User>(registerUserDTO));
+            if (createdUser != null)
+            {
+                return new TokenDTO { Token = GenerateToken(createdUser), UserId = createdUser.Id, UserType = createdUser.Usertype };
+            }
+
+            throw new ArgumentException("Failed to create user.");
+        }
+
+        private string GenerateToken(User user)
+        {
+            var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("username", user.Username), new Claim("role", user.Usertype) }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
     }
 }
