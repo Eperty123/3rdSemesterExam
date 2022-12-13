@@ -1,38 +1,30 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private IUserService _userService;
+        private IAuthenticationService _authService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IAuthenticationService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public ActionResult<TokenDTO> Login(LoginUserDTO loginUserDTO)
         {
-            try
-            {
-                var foundUser = _userService.GetUserByUsername(loginUserDTO);
-                if (foundUser != null)
-                {
-                    var token = new TokenDTO { Token = foundUser.Password, UserId = foundUser.Id, UserType = foundUser.Usertype };
-                    return Ok(token);
-                }
+            var token = _authService.Login(loginUserDTO);
+            if (token != null) return token;
 
-                return BadRequest("User with the username not found.");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return BadRequest("User with the username not found.");
         }
     }
 }
