@@ -12,7 +12,7 @@ namespace XunitTest
 {
     public class UserServiceTest
     {
-        //Test 1.1
+        //Test 1.1 - Successfully create UserService with valid repository
         [Fact]
         public void CreateUserServiceWithValidRepository()
         {
@@ -30,7 +30,7 @@ namespace XunitTest
             Assert.True(userService is UserService);
         }
 
-        //Test 1.2
+        //Test 1.2 - Throw ArgumentException when trying to create UserService with invalid repository
         [Fact]
         public void CreateUserServiceWithInvalidRepository()
         {
@@ -44,7 +44,7 @@ namespace XunitTest
             Assert.Null(userService);
         }
 
-        //Test 1.3 - Valid inputs
+        //Test 1.3 - Successfully create a user with valid inputs (name, email, password & user type)
         [Theory]
         [InlineData("MartinK", "martink@yahoo.com", "hackme", "Client")]    //Valid client user
         [InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "Coach")]   //Valid coach user
@@ -85,7 +85,7 @@ namespace XunitTest
             userRepositoryMock.Verify(x => x.CreateUser(validUser), Times.Once);
         }
 
-        //Test 1.4 - Invalid inputs
+        //Test 1.4 - Throw ArgumentException when trying to create user with invalid inputs
         [Theory]
         [InlineData("", "penguinz0@yahoo.com", "hackme", "Coach")]              //Username is an empty string
         [InlineData(null, "penguinz0@yahoo.com", "hackme", "Coach")]            //Username is null
@@ -323,40 +323,5 @@ namespace XunitTest
             Assert.Equal(fakeUser, result);
             mockRepo.Verify(r => r.ReadUserById(id), Times.Once);
         }
-
-        //Test 1.4 - Invalid inputs
-        //[Theory]
-        //[InlineData("", "penguinz0@yahoo.com", "hackme", "Coach")]              //Username is an empty string
-        //[InlineData(null, "penguinz0@yahoo.com", "hackme", "Coach")]            //Username is null
-        //[InlineData("Charlie", "", "hackme", "Coach")]                          //Email is an empty string
-        //[InlineData("Charlie", null, "hackme", "Coach")]                        //Email is null
-        //[InlineData("Charlie", "penguinz0@yahoo.com", "", "Coach")]             //Password is an empty string
-        //[InlineData("Charlie", "penguinz0@yahoo.com", null, "Coach")]           //Password is null
-        //[InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "")]            //UserType is an empty string
-        //[InlineData("Charlie", "penguinz0@yahoo.com", "hackme", null)]          //UserType is null
-        //[InlineData("Charlie", "penguinz0@yahoo.com", "hackme", "UserType")]    //UserType is not "Client" or "Coach"
-        //public void GetInvalidUser(string username, string email, string password, string usertype)
-        //{
-        //    // Arrange
-        //    Mock<IUserRepository> userRepositoryMock = new Mock<IUserRepository>();
-        //    IUserRepository repository = userRepositoryMock.Object;
-
-        //    LoginUserDTO invalidUserDTO = new LoginUserDTO { Username = username, Password = password };
-        //    User invalidUser = new User { Username = username, Email = email, Password = password, Usertype = usertype };
-
-        //    userRepositoryMock.Setup(x => x.CreateUser(invalidUser)).Returns(invalidUser);
-
-        //    Mock<IMapper> mockMapper = new Mock<IMapper>();
-        //    mockMapper.Setup(x => x.Map<User>(invalidUserDTO)).Returns(invalidUser);
-        //    var validator = new UserRegistrationValidator();
-
-        //    IUserService service = new UserService(repository, mockMapper.Object, validator);
-
-        //    //Act + Assert
-
-        //    Assert.Throws<ValidationException>(() => service.GetUser(invalidUserDTO.));
-
-        //    userRepositoryMock.Verify(x => x.CreateUser(invalidUser), Times.Never);
-        //}
     }
 }

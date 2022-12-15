@@ -21,10 +21,17 @@ namespace API.Controllers
         [HttpPost]
         public ActionResult<TokenDTO> Login(LoginUserDTO loginUserDTO)
         {
-            var token = _authService.Login(loginUserDTO);
-            if (token != null) return token;
+            try
+            {
+                var token = _authService.Login(loginUserDTO);
+                if (token != null) return token;
 
-            return BadRequest("User with the username not found.");
+                return BadRequest("User with the username not found.");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
