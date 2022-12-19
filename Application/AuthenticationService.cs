@@ -38,21 +38,13 @@ namespace Application
             var foundUser = _userRepository.ReadUserByUsername(loginUserDTO.Username);
             if (foundUser != null)
             {
+                if (!foundUser.Password.VerifyHashedPasswordBCrypt(loginUserDTO.Password))
+                    throw new ArgumentException("Wrong password");
+
                 return new TokenDTO { Token = GenerateToken(foundUser), UserId = foundUser.Id, UserType = foundUser.Usertype };
             }
 
             throw new KeyNotFoundException("User not found.");
-        }
-
-        public TokenDTO Register(RegisterUserDTO registerUserDTO)
-        {
-            var createdUser = _userRepository.CreateUser(_mapper.Map<User>(registerUserDTO));
-            if (createdUser != null)
-            {
-                return new TokenDTO { Token = GenerateToken(createdUser), UserId = createdUser.Id, UserType = createdUser.Usertype };
-            }
-
-            throw new ArgumentException("Failed to create user.");
         }
 
         private string GenerateToken(User user)

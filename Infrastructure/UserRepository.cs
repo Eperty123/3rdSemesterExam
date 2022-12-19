@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.DTOs;
 using Application.Helpers;
-using Application.Interfaces;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,7 +41,14 @@ namespace Infrastructure
 
         public User DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var foundUser = _context.UserTable.FirstOrDefault(u => u.Id == id);
+            if (foundUser != null)
+            {
+                _context.UserTable.Remove(foundUser);
+                _context.SaveChanges();
+                return foundUser;
+            }
+            throw new KeyNotFoundException("There was no user with id " + id);
         }
 
         public User ReadUserById(int id)

@@ -18,11 +18,11 @@ namespace XunitTest
 
         User[] fakeRepo = new User[]
         {
-                new User { Username = "MartinK", Email = "martink@yahoo.com", Password = "hackme", Usertype = "Client" },
-                new User { Username = "Charlie", Email = "penguinz0@yahoo.com", Password = "hackme", Usertype = "Coach" }
+                new User { Username = "MartinK", Email = "martink@yahoo.com", Password = "hackme".HashPasswordBCrypt(), Usertype = "Client" },
+                new User { Username = "Charlie", Email = "penguinz0@yahoo.com", Password = "hackme".HashPasswordBCrypt(), Usertype = "Coach" }
         };
 
-        //Test 1.1  
+        //Test 6.1 - Successfully create AuthenticationService with valid repository
         [Fact]
         public void CreateAuthenticationServiceWithValidRepository()
         {
@@ -38,7 +38,7 @@ namespace XunitTest
             Assert.True(authenticationService is AuthenticationService);
         }
 
-        //Test 1.2
+        //Test 6.2 - Throw ArgumentException when trying to create AuthenticationService with invalid repository
         [Fact]
         public void CreateUserServiceWithInvalidRepository()
         {
@@ -53,6 +53,7 @@ namespace XunitTest
             Assert.Null(authenticationService);
         }
 
+        // 6.3 - Login with valid username and password
         [Theory]
         [InlineData("MartinK", "hackme")]    //Valid user 1
         [InlineData("Charlie", "hackme")]   //Valid user 2
@@ -82,10 +83,13 @@ namespace XunitTest
             mockRepository.Verify(r => r.ReadUserByUsername(username), Times.Once);
         }
 
+        // 6.4 - Login with invalid username and password
         [Theory]
-        [InlineData("MartinK1", "hackme")]    //Invalid user 1
-        [InlineData("Charlie1", "hackme")]   //Invalid user 2
-        public void LoginWithInvalidCredentials(string username, string password)
+        [InlineData("MartinK1", "hackme", typeof(KeyNotFoundException))]    //Invalid user 1 with wrong username
+        [InlineData("Charlie1", "hackme", typeof(KeyNotFoundException))]   //Invalid user 2 with wrong username
+        [InlineData("MartinK", "hackme1", typeof(ArgumentException))]   //Invalid user 1 with correct username but wrong password
+        [InlineData("Charlie", "hackme1", typeof(ArgumentException))]   //Invalid user 2 with correct username but wrong password
+        public void LoginWithInvalidCredentials(string username, string password, Type exceptionType)
         {
             // Arrange
             Mock<IUserRepository> mockRepository = new Mock<IUserRepository>();
@@ -101,7 +105,7 @@ namespace XunitTest
             IAuthenticationService authenticationService = new AuthenticationService(repository, mockMapper.Object, _jwtConfig);
 
             // Act + assert
-            Assert.Throws<KeyNotFoundException>(() => authenticationService.Login(invalidUserDTO));
+            Assert.Throws(exceptionType, () => authenticationService.Login(invalidUserDTO));
             mockRepository.Verify(r => r.ReadUserByUsername(username), Times.Once);
         }
     }
